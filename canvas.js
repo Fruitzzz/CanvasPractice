@@ -2,7 +2,7 @@ const canvas = document.getElementById('canvas');
 const context = canvas.getContext("2d");
 const shapes = [
     {
-        id: 0,
+        path2D: null, 
         conflictWith: [],
         startPoint: {
             x: 100,
@@ -24,11 +24,15 @@ const shapes = [
             {
                 x: 150,
                 y: 250
+            },
+            {
+                x: 100,
+                y: 210
             }
         ]
     },
     {
-        id: 1,
+        path2D: null, 
         conflictWith: [],
         startPoint: {
             x: 50,
@@ -47,30 +51,38 @@ const shapes = [
                 x: 95,
                 y: 100
             },
+            {
+                x: 50,
+                y: 0
+            }
        ]
     },
     {
-        id: 2,
+        path2D: null, 
         conflictWith: [],
         startPoint: {
-            x: 200,
-            y: 0
+            x: 100,
+            y: 320
         },
         points: [
             {
-                x: 300,
-                y: 100
+                x: 50,
+                y: 400
             },
             {
-                x: 300,
-                y: 200
+                x: 200,
+                y: 450
             },
             {
                 x: 150,
-                y: 100
+                y: 290
             },
+            {
+                x: 100,
+                y: 320
+            }
        ]
-    }
+    },
 ];
 
 const mousePosition = {
@@ -87,20 +99,19 @@ let currentShape = null;
 const draw = () => {
     context.clearRect(0, 0, canvas.width, canvas.height);
     shapes.forEach(shape => {
-        context.beginPath();
-        context.moveTo(shape.startPoint.x, shape.startPoint.y);
+        shape.path2D = new Path2D();
+        shape.path2D.moveTo(shape.startPoint.x, shape.startPoint.y);
         shape.points.forEach(point => {
-            context.lineTo(point.x, point.y);
+            shape.path2D.lineTo(point.x, point.y);
         })
-        context.closePath();
-        shape.conflictWith.length != 0? printShape("red"): printShape("#00FF00");
+        shape.conflictWith.length != 0? printShape("red", shape.path2D): printShape("#00FF00", shape.path2D);
     })
 };
 
-const printShape = (color) => {
+const printShape = (color, shape) => {
     context.fillStyle = color;
-    context.fill();
-    context.stroke();
+    context.fill(shape);
+    context.stroke(shape);
 };
 
 const recalculateProperties = () => {
@@ -114,30 +125,10 @@ const recalculateProperties = () => {
     })
 };
 
-const findExtremePoints = (shape) => {
-    let left = shape.startPoint;
-    let right = shape.startPoint;
-    let bottom = shape.startPoint;
-    let top = shape.startPoint;
-    shape.points.forEach(point => {
-        point.x < left.x? left = point : null;
-        point.x > right.x? right = point : null;
-        point.y < top.y? top = point: null;
-        point.y > bottom.y? bottom = point : null;
-    })
-    return {
-        left,
-        right,
-        bottom,
-        top
-    }
-};
-
 const checkConflicts = () => {
-    const extremePoints = findExtremePoints(currentShape);
-    const conflictingShapes = isOnShape(extremePoints);
+    const conflictingShapes = isOnShape([currentShape.startPoint, ...currentShape.points]);
     currentShape.conflictWith.forEach(shape => {
-        const index = shape.conflictWith.indexOf(shape.conflictWith.findIndex(value => value.id === currentShape.id));
+        const index = shape.conflictWith.indexOf(shape.conflictWith.findIndex(value => value.path2D === currentShape.path2D));
         shape.conflictWith.splice(shape.conflictWith.indexOf(index), 1);
     });
     if(conflictingShapes.length != 0) {
@@ -150,30 +141,62 @@ const checkConflicts = () => {
         currentShape.conflictWith = [];
     }
 };
-const isOnShape = (shapePoints) => {
-    let conflictingShapes = [];
+
+const isOnShape = (currentPoints) => {
+    const conflictingShapes = [];
+    const currentShapeVectors = getVectors(currentPoints);
+   /*  shapes.forEach(shape => {
+        currentPoints.forEach(point => {
+            if(shape !== currentShape && context.isPointInPath(shape.path2D, point.x, point.y))
+                conflictingShapes.push(shape);
+        });
+    }); */
     shapes.forEach(shape => {
-        const extremePoints = findExtremePoints(shape);
-        if((shapePoints.right.x > extremePoints.left.x && shapePoints.right.x < extremePoints.right.x) && (shapePoints.right.y > extremePoints.top.y && shapePoints.right.y < extremePoints.bottom.y))
+        const shapeVectors = getVectors([shape.startPoint, ...shape.points]);
+        if(isCrossingVectors(currentShapeVectors, shapeVectors) && shape !== currentShape)
             conflictingShapes.push(shape);
-        else if((shapePoints.left.x > extremePoints.left.x && shapePoints.left.x < extremePoints.right.x) && (shapePoints.left.y > extremePoints.top.y && shapePoints.left.y < extremePoints.bottom.y))
-            conflictingShapes.push(shape);
-        else if((shapePoints.top.x > extremePoints.left.x && shapePoints.top.x < extremePoints.right.x) && (shapePoints.top.y > extremePoints.top.y && shapePoints.top.y < extremePoints.bottom.y))
-            conflictingShapes.push(shape);
-        else if(((shapePoints.bottom.x > extremePoints.left.x && shapePoints.bottom.x < extremePoints.right.x)) && (shapePoints.bottom.y > extremePoints.top.y && shapePoints.bottom.y < extremePoints.bottom.y))
-            conflictingShapes.push(shape);
-    })    
+    })
     return conflictingShapes;
 };
+
+const isCrossingVectors = (vectors1, vectors2) => {
+    let isCrossing = false;
+    let v1, v2, v3, v4;
+    vectors1.forEach(vector1 => {
+        vectors2.forEach(vector2 => {
+            v1 = (vector2.x2 - vector2.x1) * (vector1.y1 - vector2.y1) - (vector2.y2 - vector2.y1) * (vector1.x1 - vector2.x1);
+            v2 = (vector2.x2 - vector2.x1) * (vector1.y2 - vector2.y1) - (vector2.y2 - vector2.y1) * (vector1.x2 - vector2.x1);
+            v3 = (vector1.x2 - vector1.x1) * (vector2.y1 - vector1.y1) - (vector1.y2 - vector1.y1) * (vector2.x1 - vector1.x1);
+            v4 = (vector1.x2 - vector1.x1) * (vector2.y2 - vector1.y1) - (vector1.y2 - vector1.y1) * (vector2.x2 - vector1.x1);
+            if(!isCrossing)
+                isCrossing = (v1 * v2 <= 0) && (v3 * v4 <= 0);
+        });
+    });
+    return isCrossing;
+}
+
+const getVectors = (points) => {
+    const vectors = [];
+    for(let i = 0; i < points.length - 1; i++) {
+        vectors.push({
+            x1: points[i].x,
+            y1: points[i].y,
+            x2: points[i + 1].x,
+            y2: points[i + 1].y
+        })
+    }
+    return vectors;
+}
+
 const pickShape = (mouseX, mouseY) => {
     currentShape = null;
     shapes.forEach(shape => {
-        const extremePoints = findExtremePoints(shape);
-        if((mouseX > extremePoints.left.x && mouseX < extremePoints.right.x) && (mouseY < extremePoints.bottom.y && mouseY > extremePoints.top.y)) {
-            currentShape = shape
+        if(context.isPointInPath(shape.path2D, mouseX, mouseY)) {
+            currentShape = shape;
         }
-    })
+    });
 };
+
 const calcOffset = () => {
     mousePosition.offset.x = currentShape.startPoint.x - mousePosition.x;
     mousePosition.offset.y = currentShape.startPoint.y - mousePosition.y;
