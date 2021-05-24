@@ -10,11 +10,10 @@ window.onload = () => {
     const shapeService = new ShapeService(pointsArray);
     const boundingClientRect = canvas.getBoundingClientRect();
     let currentShape;
-    let point;
     let mousePosition = new Point(0, 0);
 
     canvas.addEventListener("mousemove", (event) => {
-        mousePosition = new Point(event.clientX - boundingClientRect.x, event.clientY - boundingClientRect.y);
+        const point = new Point(event.clientX - boundingClientRect.x, event.clientY - boundingClientRect.y);
 
         if (currentShape) {
             const delta = new Point(point.x - mousePosition.x, point.y - mousePosition.y);
@@ -22,11 +21,11 @@ window.onload = () => {
             shapeService.drawAllShapes(canvas, context);
         }
         
-        point = mousePosition;
+        mousePosition = point;
     });
     
     canvas.addEventListener("mousedown", () => {
-        currentShape = shapeService.getShapeUnderPoint(mousePosition, context); 
+        currentShape = shapeService.getShapeUnderPoint(mousePosition, context);
     });
     
     canvas.addEventListener("mouseup", () => {

@@ -27,8 +27,8 @@ export class Shape {
 
     move(delta) {
         this.points.forEach(point => {
-            point.x -= delta.x;
-            point.y -= delta.y;
+            point.x += delta.x;
+            point.y += delta.y;
         })
     }
 }
