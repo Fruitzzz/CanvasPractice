@@ -1,8 +1,12 @@
+import { Point } from "./point";
+
 export class Shape {
     constructor(points) {
         this.path2D = null;
         this.intersectingShapes = [];
+        this.snappedShapes = [];
         this.points = points;
+        this.originalPoints = this.getPointsDuplicate(points);
     }
 
     draw(context) {
@@ -30,5 +34,40 @@ export class Shape {
             point.x += delta.x;
             point.y += delta.y;
         })
+    }
+
+    getPointsDuplicate(points) {
+        const duplicatePoints = [];
+
+        points.forEach(point => {
+            duplicatePoints.push(new Point(point.x, point.y, 0));
+        })
+
+        return duplicatePoints;
+    }
+
+    clearIntersection () {
+        this.intersectingShapes.forEach(shape => {
+           shape.intersectingShapes.splice(this.intersectingShapes.findIndex(value => value.path2D === this.path2D), 1);
+       });
+
+       this.intersectingShapes = [];
+    }
+    
+    clearSnap () {
+        this.snappedShapes.forEach(snap => {
+            snap.shape.snappedShapes.splice(this.snappedShapes.findIndex(value => value.path2D === this.path2D), 1);
+        });
+        this.snappedShapes = [];
+    }
+
+    moveEnded () {
+        this.originalPoints = this.getPointsDuplicate(this.points);
+    }
+
+    resetToOriginalPosition() {
+        this.clearIntersection();
+        this.clearSnap();
+        this.points = this.getPointsDuplicate(this.originalPoints);
     }
 }

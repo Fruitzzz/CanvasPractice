@@ -2,26 +2,52 @@ import { Point } from "../entities/point";
 
 export const pointsArray = [
     [
-        new Point(100, 210),
-        new Point(50, 250),
-        new Point(75, 290),
-        new Point(125, 290),
-        new Point(150, 250),
-        new Point(100, 210)
+        new Point(20, 20, 0),
+        new Point(20, 250, 0),
+        new Point(200, 250, 0),
+        new Point(200, 20, 0),
+        new Point(20, 20, 0),
     ],
     [
-        new Point(50, 0),
-        new Point(5, 100),
-        new Point(50, 200),
-        new Point(95, 100),
-        new Point(50, 0)
+        new Point(20, 280, 0),
+        new Point(20, 340, 0),
+        new Point(200, 340, 0),
+        new Point(200, 280, 0),
+        new Point(20, 280, 0),
     ],
     [
-        
-        new Point(100, 320),
-        new Point(50, 400),
-        new Point(200, 450),
-        new Point(150, 290),
-        new Point(100, 320)
-    ]
+        new Point(20, 370, 0),
+        new Point(20, 480, 0),
+        new Point(100, 480, 0),
+        new Point(100, 370, 0),
+        new Point(20, 370, 0),
+    ],
+    [
+        new Point(120, 370, 0),
+        new Point(120, 480, 0),
+        new Point(200, 480, 0),
+        new Point(200, 370, 0),
+        new Point(120, 370, 0),
+    ],
+    [
+        new Point(20, 510, 0),
+        new Point(20, 570, 0),
+        new Point(200, 570, 0),
+        new Point(200, 510, 0),
+        new Point(20, 510, 0),
+    ],
+    [
+        new Point(20, 600, 0),
+        new Point(20, 670, 0),
+        new Point(100, 670, 0),
+        new Point(100, 600, 0),
+        new Point(20, 600, 0),
+    ],
+    [
+        new Point(120, 600, 0),
+        new Point(120, 670, 0),
+        new Point(200, 670, 0),
+        new Point(200, 600, 0),
+        new Point(120, 600, 0),
+    ],
 ]

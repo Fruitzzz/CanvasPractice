@@ -1,4 +1,3 @@
-import { getSegments, isCrossingSegments } from "../helpers/pointHelper";
 import { Shape } from "../entities/shape";
 
 export class ShapeService {
@@ -14,49 +13,28 @@ export class ShapeService {
     }
 
     drawAllShapes (canvas, context) {
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            this.shapes.forEach(shape => {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        this.shapes.forEach(shape => {
             shape.draw(context);
         })   
     }
     
     getShapeUnderPoint (point, context) {
-        let currentShape = null;
-
+        let selectedShape;
         this.shapes.forEach(shape => {
             if (context.isPointInPath(shape.path2D, point.x, point.y)) {
-              currentShape = shape;
+              selectedShape = shape;
             }
         });
-
-        return currentShape;
-    }
-
-    checkShapesIntersection (currentShape) {
-        const conflictingShapes = this.getIntersectingShapes(currentShape);
-
-        currentShape.intersectingShapes.forEach(shape => {
-            shape.intersectingShapes.splice(shape.intersectingShapes.findIndex(value => value.path2D === currentShape.path2D), 1);
-        });
-            conflictingShapes.forEach(shape => {
-                shape.intersectingShapes.push(currentShape);
-            })
-            currentShape.intersectingShapes = conflictingShapes;
-    }
-
-    getIntersectingShapes (currentShape) {
-        const conflictingShapes = [];
-        const currentShapeSegments = getSegments(currentShape.points);
         
-        this.shapes.forEach(shape => {
-            const shapeSegments = getSegments(shape.points);
-            if(isCrossingSegments(currentShapeSegments, shapeSegments) && shape !== currentShape)
-                conflictingShapes.push(shape);
-        })
-
-        return conflictingShapes;
+        return selectedShape;
     }
-    
+
+    get getAllShapes() {
+        return this.shapes;
+    } 
+
     getShapeFromPoints(points) {
         return new Shape(points);
     }
