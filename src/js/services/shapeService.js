@@ -1,18 +1,17 @@
+import { Point } from "../entities/point";
 import { Shape } from "../entities/shape";
 
 export class ShapeService {
-
-    constructor (points) {
+    constructor(points) {
         const shapes = [];
 
         points.forEach(array => {
             shapes.push(this.getShapeFromPoints(array));
         })
-
         this.shapes = shapes;
     }
 
-    drawAllShapes (canvas, context) {
+    drawAllShapes(canvas, context) {
         context.clearRect(0, 0, canvas.width, canvas.height);
 
         this.shapes.forEach(shape => {
@@ -20,7 +19,7 @@ export class ShapeService {
         })   
     }
     
-    getShapeUnderPoint (point, context) {
+    getShapeUnderPoint(point, context) {
         let selectedShape;
         this.shapes.forEach(shape => {
             if (context.isPointInPath(shape.path2D, point.x, point.y)) {
@@ -31,12 +30,18 @@ export class ShapeService {
         return selectedShape;
     }
 
-    get getAllShapes() {
+    getAllShapes() {
         return this.shapes;
     } 
 
     getShapeFromPoints(points) {
-        return new Shape(points);
+        const createdPoints = [];
+
+        points.forEach(value => {
+            createdPoints.push(new Point(value[0], value[1]))
+        })
+
+        return new Shape(createdPoints);
     }
 
 }

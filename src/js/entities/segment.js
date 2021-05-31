@@ -2,14 +2,13 @@ import { getLengthByRelativePoint } from "../helpers/segmentHelper";
 import { Point } from "./point";
 
 export class Segment {
-
     constructor(point1, point2) {
         this.startPoint = point1;
         this.endPoint = point2;
     }
 
-    get getSegmentCoordinates() {
-        return new Point(this.endPoint.x - this.startPoint.x, this.endPoint.y - this.startPoint.y, this.endPoint.z - this.startPoint.z); 
+    getSegmentCoordinates() {
+        return new Point(this.endPoint.x - this.startPoint.x, this.endPoint.y - this.startPoint.y); 
     }
 
     isPointOnSegmentSpace(point) {
@@ -23,16 +22,16 @@ export class Segment {
         return false;
     }
 
-    get getSegmentOrientation() {
+    getSegmentOrientation() {
         return this.startPoint.x === this.endPoint.x ? "Y" : "X"
     }
 
-    get getSegmentCenter() {
-        return new Point((this.startPoint.x + this.endPoint.x) / 2, (this.startPoint.y + this.endPoint.y ) / 2, 0)
+    getSegmentCenter() {
+        return new Point((this.startPoint.x + this.endPoint.x) / 2, (this.startPoint.y + this.endPoint.y ) / 2)
     }
 
-    get getSegmentLength() {
-        const segmentCoordinates = this.getSegmentCoordinates;
+    getSegmentLength() {
+        const segmentCoordinates = this.getSegmentCoordinates();
 
         return getLengthByRelativePoint(segmentCoordinates);
     }

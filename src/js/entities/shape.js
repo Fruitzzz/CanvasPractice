@@ -40,13 +40,13 @@ export class Shape {
         const duplicatePoints = [];
 
         points.forEach(point => {
-            duplicatePoints.push(new Point(point.x, point.y, 0));
+            duplicatePoints.push(new Point(point.x, point.y));
         })
 
         return duplicatePoints;
     }
 
-    clearIntersection () {
+    clearIntersection() {
         this.intersectingShapes.forEach(shape => {
            shape.intersectingShapes.splice(this.intersectingShapes.findIndex(value => value.path2D === this.path2D), 1);
        });
@@ -54,14 +54,14 @@ export class Shape {
        this.intersectingShapes = [];
     }
     
-    clearSnap () {
+    clearSnap() {
         this.snappedShapes.forEach(snap => {
             snap.shape.snappedShapes.splice(this.snappedShapes.findIndex(value => value.path2D === this.path2D), 1);
         });
         this.snappedShapes = [];
     }
 
-    onMoveEnded () {
+    onMoveEnded() {
         this.originalPoints = this.getPointsDuplicate(this.points);
     }
 

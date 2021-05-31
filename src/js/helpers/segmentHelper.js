@@ -1,7 +1,6 @@
-import { Point } from "../entities/point";
 import { Segment } from "../entities/segment";
 
-export function getSegments (points) {
+export function getSegments(points) {
     const segments = [];
         
     points.forEach((point, index) => {
@@ -13,7 +12,7 @@ export function getSegments (points) {
     return segments;
 }
 
-export function getPointsOrientation (point1, point2, point3) {
+export function getPointsOrientation(point1, point2, point3) {
     const value = (point3.y - point1.y) * (point2.x - point3.x) - (point3.x - point1.x) * (point2.y - point3.y);
   
     if (value == 0) {
@@ -38,31 +37,27 @@ export function checkAllSegments(segments1, segments2) {
 }
 
 export function distanceBetweenPointAndSegment(segment, point) {
-    const vectorPoint = vectorProduct(segment.getSegmentCoordinates, new Segment(segment.startPoint, point).getSegmentCoordinates);
+    const vector = vectorProduct(segment.getSegmentCoordinates(), new Segment(segment.startPoint, point).getSegmentCoordinates());
 
-    return getLengthByRelativePoint(vectorPoint) / segment.getSegmentLength;
+    return Math.sqrt(Math.pow(vector, 2)) / segment.getSegmentLength();
 }
 
 export function getLengthByRelativePoint(point) {
-    return  Math.sqrt(Math.pow(point.x, 2) + Math.pow(point.y, 2) + Math.pow(point.z, 2));
+    return  Math.sqrt(Math.pow(point.x, 2) + Math.pow(point.y, 2));
 }
 
 export function vectorProduct(point1, point2) {
-    const x = (point1.y * point2.z - point1.z * point2.y);
-    const y = (point1.z * point2.x - point1.x * point2.z);
-    const z = (point1.x * point2.y - point1.y * point2.x);
-
-    return new Point(x, y, z);
+    return (point1.x * point2.y - point1.y * point2.x);
 }
 
-export function getPointsFromSegment (segment, shape) {
+export function getPointsFromSegment(segment, shape) {
     return [
         shape.points.find(point => point === segment.startPoint),
         shape.points.find(point => point === segment.endPoint)
     ];
 }
 
-export function distanceBetweenTwoPoints (point1, point2) {
+export function distanceBetweenTwoPoints(point1, point2) {
     return Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2));
 }
 

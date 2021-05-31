@@ -13,7 +13,7 @@ window.onload = () => {
     const canvas = document.getElementById("canvas");
     const context = canvas.getContext("2d");
     const shapeService = new ShapeService(shapes);
-    const createdShapes = shapeService.getAllShapes;
+    const createdShapes = shapeService.getAllShapes();
     const shapeIntersectionService = new ShapeIntersectionService(createdShapes);
     const shapeSnapService = new ShapeSnapService(createdShapes, mousePosition);
     const boundingClientRect = canvas.getBoundingClientRect();

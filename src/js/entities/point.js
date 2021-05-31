@@ -1,8 +1,6 @@
 export class Point {
-
-    constructor(x, y, z) {
+    constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.z = z;
     }
 }
