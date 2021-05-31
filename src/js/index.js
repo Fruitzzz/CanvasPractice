@@ -1,8 +1,8 @@
 import "../css/style.css";
-import { pointsArray } from "./config/pointConfig";
+import { shapes } from "./config/shapes";
 import { Point } from "./entities/point";
 import { ShapeService } from "./services/shapeService";
-import {ShapeIntersectionService} from "./services/shapeIntersectionService";
+import { ShapeIntersectionService } from "./services/shapeIntersectionService";
 import { ShapeSnapService } from "./services/shapeSnapService";
 
 
@@ -12,9 +12,10 @@ window.onload = () => {
 
     const canvas = document.getElementById("canvas");
     const context = canvas.getContext("2d");
-    const shapeService = new ShapeService(pointsArray);
-    const shapeIntersectionService = new ShapeIntersectionService(shapeService.getAllShapes);
-    const shapeSnapService = new ShapeSnapService(shapeService.getAllShapes, mousePosition);
+    const shapeService = new ShapeService(shapes);
+    const createdShapes = shapeService.getAllShapes;
+    const shapeIntersectionService = new ShapeIntersectionService(createdShapes);
+    const shapeSnapService = new ShapeSnapService(createdShapes, mousePosition);
     const boundingClientRect = canvas.getBoundingClientRect();
     
 
@@ -53,7 +54,7 @@ window.onload = () => {
     
     canvas.addEventListener("mouseup", () => {
         if (selectedShape) {
-            selectedShape.intersectingShapes.length !== 0? selectedShape.resetToOriginalPosition() : selectedShape.moveEnded();
+            selectedShape.intersectingShapes.length !== 0? selectedShape.resetToOriginalPosition() : selectedShape.onMoveEnded();
             shapeService.drawAllShapes(canvas, context);
 
             selectedShape = null;

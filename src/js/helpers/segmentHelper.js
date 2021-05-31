@@ -38,7 +38,7 @@ export function checkAllSegments(segments1, segments2) {
 }
 
 export function distanceBetweenPointAndSegment(segment, point) {
-    const vectorPoint = vectorProduct(segment.getSegmentCoordinates, new Segment(segment.point1, point).getSegmentCoordinates);
+    const vectorPoint = vectorProduct(segment.getSegmentCoordinates, new Segment(segment.startPoint, point).getSegmentCoordinates);
 
     return getLengthByRelativePoint(vectorPoint) / segment.getSegmentLength;
 }
@@ -57,8 +57,8 @@ export function vectorProduct(point1, point2) {
 
 export function getPointsFromSegment (segment, shape) {
     return [
-        shape.points.find(point => point === segment.point1),
-        shape.points.find(point => point === segment.point2)
+        shape.points.find(point => point === segment.startPoint),
+        shape.points.find(point => point === segment.endPoint)
     ];
 }
 
@@ -67,10 +67,10 @@ export function distanceBetweenTwoPoints (point1, point2) {
 }
 
 export function isCrossingSegments (segment1, segment2) {
-    let o1 = getPointsOrientation(segment1.point1, segment1.point2, segment2.point1);
-    let o2 = getPointsOrientation(segment1.point1, segment1.point2, segment2.point2);
-    let o3 = getPointsOrientation(segment2.point1, segment2.point2, segment1.point1);
-    let o4 = getPointsOrientation(segment2.point1, segment2.point2, segment1.point2);
+    let o1 = getPointsOrientation(segment1.startPoint, segment1.endPoint, segment2.startPoint);
+    let o2 = getPointsOrientation(segment1.startPoint, segment1.endPoint, segment2.endPoint);
+    let o3 = getPointsOrientation(segment2.startPoint, segment2.endPoint, segment1.startPoint);
+    let o4 = getPointsOrientation(segment2.startPoint, segment2.endPoint, segment1.endPoint);
 
     if (o1 != o2 && o3 != o4) {
         return true;

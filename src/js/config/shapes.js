@@ -1,6 +1,6 @@
 import { Point } from "../entities/point";
 
-export const pointsArray = [
+export const shapes = [
     [
         new Point(20, 20, 0),
         new Point(20, 250, 0),

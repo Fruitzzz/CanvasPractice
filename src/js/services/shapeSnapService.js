@@ -1,4 +1,4 @@
-import {distanceBetweenPointAndSegment, distanceBetweenTwoPoints, getPointsFromSegment, getSegments } from "../helpers/segmentHelper";
+import * as segmentHelper from "../helpers/segmentHelper";
 import { Point } from "../entities/point";
 
 export class ShapeSnapService {
@@ -14,8 +14,8 @@ export class ShapeSnapService {
             return;
         }
 
-        const pointsOnSelectedShape = getPointsFromSegment(shapeForSnapping.selectedSegment, selectedShape);
-        const delta = new Point(shapeForSnapping.segment.point1.x - pointsOnSelectedShape[1].x, shapeForSnapping.segment.point1.y - pointsOnSelectedShape[1].y, 0);
+        const pointsOnSelectedShape = segmentHelper.getPointsFromSegment(shapeForSnapping.selectedSegment, selectedShape);
+        const delta = new Point(shapeForSnapping.segment.startPoint.x - pointsOnSelectedShape[1].x, shapeForSnapping.segment.startPoint.y - pointsOnSelectedShape[1].y, 0);
         const orientation = shapeForSnapping.segment.getSegmentOrientation;
 
         this.saveSnap(selectedShape, shapeForSnapping);
@@ -23,12 +23,11 @@ export class ShapeSnapService {
 
         if (orientation === "X") {
             selectedShape.move(new Point (0, delta.y, 0));
-        }
-
-        else if (orientation === "Y") {
+        } else if (orientation === "Y") {
             selectedShape.move(new Point (delta.x, 0, 0));
         }
     }
+
     saveSnap (selectedShape, shapeForSnapping) {
         selectedShape.snappedShapes.push({
             ownSegment: shapeForSnapping.selectedSegment,
@@ -46,24 +45,26 @@ export class ShapeSnapService {
     shapeMoveInSnap (selectedShape, mousePosition, shapeIntersectionService) {
         const orientation = selectedShape.snappedShapes[0].targetSegment.getSegmentOrientation;
         const borderValues = this.defineBorderValues(selectedShape.snappedShapes[0].targetSegment, selectedShape.snappedShapes[0].ownSegment);
-        const delta = new Point(mousePosition.x - this.mousePositionOnSnappedShape.x, mousePosition.y - this.mousePositionOnSnappedShape.y, 0);
+        const point = new Point(mousePosition.x - this.mousePositionOnSnappedShape.x, mousePosition.y - this.mousePositionOnSnappedShape.y, 0);
 
-        if (distanceBetweenTwoPoints(mousePosition, this.mousePositionOnSnappedShape) > 20) {
+        if (segmentHelper.distanceBetweenTwoPoints(mousePosition, this.mousePositionOnSnappedShape) > 20) {
             const point = new Point(mousePosition.x - this.mousePositionOnSnappedShape.x, mousePosition.y - this.mousePositionOnSnappedShape.y, 0);
+
             selectedShape.clearSnap();
             selectedShape.move(point);
             shapeIntersectionService.checkShapesIntersection(selectedShape);
+
             return;
         }
         
         if (orientation === "X") {
-            this.moveAlongAxisX(borderValues, delta, selectedShape);
+            this.moveAlongAxisX(borderValues, point, selectedShape);
             this.mousePositionOnSnappedShape.x = mousePosition.x;
         }
 
         if (orientation === "Y") {
             this.mousePositionOnSnappedShape.y = mousePosition.y;
-            this.moveAlongAxisY(borderValues, delta, selectedShape);
+            this.moveAlongAxisY(borderValues, point, selectedShape);
         }
     }
 
@@ -80,18 +81,18 @@ export class ShapeSnapService {
     }
 
     defineBorderValues (targetSegment, selectedSegment) {
-        if (targetSegment.point1.x === selectedSegment.point1.x) {
+        if (targetSegment.startPoint.x === selectedSegment.startPoint.x) {
             return  {
                 targetPoints:
                 [
-                    Math.min(targetSegment.point1.y, targetSegment.point2.y),
-                    Math.max(targetSegment.point1.y, targetSegment.point2.y)
+                    Math.min(targetSegment.startPoint.y, targetSegment.endPoint.y),
+                    Math.max(targetSegment.startPoint.y, targetSegment.endPoint.y)
                 ],
 
                 selectedPoints:
                 [
-                    Math.min(selectedSegment.point1.y, selectedSegment.point2.y),
-                    Math.max(selectedSegment.point1.y, selectedSegment.point2.y)
+                    Math.min(selectedSegment.startPoint.y, selectedSegment.endPoint.y),
+                    Math.max(selectedSegment.startPoint.y, selectedSegment.endPoint.y)
                 ]
             } 
         }
@@ -99,20 +100,20 @@ export class ShapeSnapService {
         return  {
             targetPoints:
             [
-                Math.min(targetSegment.point1.x, targetSegment.point2.x),
-                Math.max(targetSegment.point1.x, targetSegment.point2.x)
+                Math.min(targetSegment.startPoint.x, targetSegment.endPoint.x),
+                Math.max(targetSegment.startPoint.x, targetSegment.endPoint.x)
             ],
 
             selectedPoints:
             [
-                Math.min(selectedSegment.point1.x, selectedSegment.point2.x),
-                Math.max(selectedSegment.point1.x, selectedSegment.point2.x)
+                Math.min(selectedSegment.startPoint.x, selectedSegment.endPoint.x),
+                Math.max(selectedSegment.startPoint.x, selectedSegment.endPoint.x)
             ]
         } 
     }
     
     getShapeForSnapping (selectedShape) {
-       const segments = getSegments(selectedShape.points);
+       const segments = segmentHelper.getSegments(selectedShape.points);
        let closest;
 
        segments.forEach(segment => {
@@ -121,7 +122,7 @@ export class ShapeSnapService {
                     return;
                 }
 
-                const found =  this.getClosestSegment(shape, segment);
+                const found = this.getClosestSegment(shape, segment);
     
                 if (found && !closest) {
                     closest = { 
@@ -149,23 +150,23 @@ export class ShapeSnapService {
     }
 
     getRelevantPoint (segment, points) {
-        const isEqualDistance = points.every(point => distanceBetweenPointAndSegment(segment, point) === distanceBetweenPointAndSegment(segment, points[0]));
+        const isEqualDistance = points.every(point => segmentHelper.distanceBetweenPointAndSegment(segment, point) === segmentHelper.distanceBetweenPointAndSegment(segment, points[0]));
 
         return points.find(point => segment.isPointOnSegmentSpace(point) && isEqualDistance);
     }
 
     getClosestSegment (shape, targetSegment) {
-        const segments = getSegments(shape.points);
+        const segments = segmentHelper.getSegments(shape.points);
         const targetAnchorPoints = this.getSegmentAnchorPoints(targetSegment);
         let closestSegment;
 
         segments.forEach(segment => {
             const relevantPoint = this.getRelevantPoint(segment, targetAnchorPoints);
 
-            if (relevantPoint && distanceBetweenPointAndSegment(segment, relevantPoint) < 20) {
+            if (relevantPoint && segmentHelper.distanceBetweenPointAndSegment(segment, relevantPoint) < 20) {
                 closestSegment = {
                     segment,
-                    distance: distanceBetweenPointAndSegment(segment, relevantPoint),
+                    distance: segmentHelper.distanceBetweenPointAndSegment(segment, relevantPoint),
                     targetAnchorPoints
                 };
             }
@@ -176,9 +177,9 @@ export class ShapeSnapService {
 
     getSegmentAnchorPoints (segment) {
        const anchorPoints = [
-           segment.point1,
-           segment.point2,
-           segment.getcenterOfSegment 
+           segment.startPoint,
+           segment.endPoint,
+           segment.getSegmentCenter
        ];
 
        return anchorPoints;

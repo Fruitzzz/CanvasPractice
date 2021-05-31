@@ -4,20 +4,19 @@ import { Point } from "./point";
 export class Segment {
 
     constructor(point1, point2) {
-        this.point1 = point1;
-        this.point2 = point2;
+        this.startPoint = point1;
+        this.endPoint = point2;
     }
 
     get getSegmentCoordinates() {
-        return new Point(this.point2.x - this.point1.x, this.point2.y - this.point1.y, this.point2.z - this.point1.z); 
+        return new Point(this.endPoint.x - this.startPoint.x, this.endPoint.y - this.startPoint.y, this.endPoint.z - this.startPoint.z); 
     }
 
-    isPointOnSegmentSpace (point) {
-        if (point.x > Math.min(this.point1.x, this.point2.x) && point.x < Math.max(this.point1.x, this.point2.x)) {
-            return true;
-        }
+    isPointOnSegmentSpace(point) {
+        const isPointWithinSegmentHorizontally = point.x > Math.min(this.startPoint.x, this.endPoint.x) && point.x < Math.max(this.startPoint.x, this.endPoint.x);
+        const isPointWithinSegmentVertically = point.y > Math.min(this.startPoint.y, this.endPoint.y) && point.y < Math.max(this.startPoint.y, this.endPoint.y);
 
-        if (point.y > Math.min(this.point1.y, this.point2.y) && point.y < Math.max(this.point1.y, this.point2.y)) {
+        if (isPointWithinSegmentHorizontally || isPointWithinSegmentVertically) {
             return true;
         }
 
@@ -25,11 +24,11 @@ export class Segment {
     }
 
     get getSegmentOrientation() {
-        return this.point1.x === this.point2.x? "Y" : "X"
+        return this.startPoint.x === this.endPoint.x ? "Y" : "X"
     }
 
-    get getcenterOfSegment () {
-        return new Point((this.point1.x + this.point2.x) / 2, (this.point1.y + this.point2.y ) / 2, 0)
+    get getSegmentCenter() {
+        return new Point((this.startPoint.x + this.endPoint.x) / 2, (this.startPoint.y + this.endPoint.y ) / 2, 0)
     }
 
     get getSegmentLength() {

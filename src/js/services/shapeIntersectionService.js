@@ -5,7 +5,7 @@ export class ShapeIntersectionService {
         this.shapes = shapes;
     }
 
-    checkShapesIntersection (selectedShape) {
+    checkShapesIntersection(selectedShape) {
         const conflictingShapes = this.getIntersectingShapes(selectedShape);
 
         selectedShape.clearIntersection();
@@ -13,10 +13,11 @@ export class ShapeIntersectionService {
         conflictingShapes.forEach(shape => {
             shape.intersectingShapes.push(selectedShape);
         })
+        
         selectedShape.intersectingShapes = conflictingShapes;
     }
 
-    getIntersectingShapes (selectedShape) {
+    getIntersectingShapes(selectedShape) {
         const conflictingShapes = [];
         const currentShapeSegments = getSegments(selectedShape.points);
         

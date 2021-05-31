@@ -61,7 +61,7 @@ export class Shape {
         this.snappedShapes = [];
     }
 
-    moveEnded () {
+    onMoveEnded () {
         this.originalPoints = this.getPointsDuplicate(this.points);
     }
 
